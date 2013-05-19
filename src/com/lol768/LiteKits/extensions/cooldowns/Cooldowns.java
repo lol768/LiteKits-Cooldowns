@@ -24,8 +24,9 @@ public class Cooldowns extends JavaPlugin implements Listener {
             if (lk.getDescription().getVersion().equals("1.0") || lk.getDescription().getVersion().equals("1.1") || lk.getDescription().getVersion().equals("1.2")) {
                 getLogger().severe("LiteKits version is too old to use this extension. Disabling self...");
                 setEnabled(false);
+            } else {
+                Bukkit.getPluginManager().registerEvents(this, this);
             }
-            Bukkit.getPluginManager().registerEvents(this, this);
         } else {
             getLogger().severe("Couldn't find LiteKits. Disabling self...");
             setEnabled(false);
