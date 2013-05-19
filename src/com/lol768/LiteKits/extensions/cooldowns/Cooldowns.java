@@ -54,17 +54,16 @@ public class Cooldowns extends JavaPlugin implements Listener {
             return;
         }
         Long amount = (Long) getMetadata(e.getPlayer(), "lastKitTime");
+        long now = System.currentTimeMillis() / 1000l;
         if (amount != null) {
-            long now = System.currentTimeMillis() / 1000l;
+            
             if ((now - amount) < getConfig().getLong("cooldown", 0)) {
                 e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You must wait " + (now - amount) + " more second(s) before selecting a kit");
                 e.setCancelled(true);
                 return;
-            } else {
-                setMetadata(e.getPlayer(), "lastKitTime", now);
-                
             }
         }
+        setMetadata(e.getPlayer(), "lastKitTime", now);
         setMetadata(e.getPlayer(), "gotKitThisLife", true);
     }
     
