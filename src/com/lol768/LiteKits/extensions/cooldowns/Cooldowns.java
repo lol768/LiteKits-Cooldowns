@@ -42,12 +42,16 @@ public class Cooldowns extends JavaPlugin implements Listener {
             saveConfig();
         }
         
+        if (!getConfig().contains("clear-cooldown-on-death")) {
+            getConfig().set("clear-cooldown-on-death", true);
+            saveConfig();
+        }
+        
         
     }
     
     @EventHandler
     public void onKitAttempt(KitCheckEvent e) {
-        getLogger().info("Got it.");
         if (getConfig().getBoolean("once-per-life", false) && getMetadata(e.getPlayer(), "gotKitThisLife") != null && ((Boolean)getMetadata(e.getPlayer(), "gotKitThisLife"))) {
             e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You can only receieve one kit per life");
             e.setCancelled(true);
@@ -58,7 +62,7 @@ public class Cooldowns extends JavaPlugin implements Listener {
         if (amount != null) {
             
             if ((now - amount) < getConfig().getLong("cooldown", 0)) {
-                e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You must wait " + (now - amount) + " more second(s) before selecting a kit");
+                e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You must wait " + (getConfig().getLong("cooldown", 0) - (now - amount)) + " more second(s) before selecting a kit");
                 e.setCancelled(true);
                 return;
             }
@@ -70,6 +74,9 @@ public class Cooldowns extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         setMetadata(e.getEntity(), "gotKitThisLife", false);
+        if ((boolean) getConfig().get("clear-cooldown-on-death", true)) {
+            setMetadata(e.getEntity(), "lastKitTime", 0);
+        }
     }
     
     public void setMetadata(Player player, String key, Object value) {
