@@ -62,7 +62,8 @@ public class Cooldowns extends JavaPlugin implements Listener {
         if (amount != null) {
             
             if ((now - amount) < getConfig().getLong("cooldown", 0)) {
-                e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You must wait " + (getConfig().getLong("cooldown", 0) - (now - amount)) + " more second(s) before selecting a kit");
+                String word = ((getConfig().getLong("cooldown", 0) - (now - amount)) == 1) ? "second" : "seconds";
+                e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You must wait " + (getConfig().getLong("cooldown", 0) - (now - amount)) + " more " + word);
                 e.setCancelled(true);
                 return;
             }
