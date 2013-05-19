@@ -38,6 +38,7 @@ public class Cooldowns extends JavaPlugin implements Listener {
         
         if (!getConfig().contains("once-per-life")) {
             getConfig().set("once-per-life", true);
+            saveConfig();
         }
         
         
