@@ -21,7 +21,7 @@ public class Cooldowns extends JavaPlugin implements Listener {
         Object obj = Bukkit.getServer().getPluginManager().getPlugin("LiteKits");
         if (obj != null) {
             lk = (LiteKits) obj;
-            if (lk.getDescription().getVersion().equals("1.0")) {
+            if (lk.getDescription().getVersion().equals("1.0") || lk.getDescription().getVersion().equals("1.1") || lk.getDescription().getVersion().equals("1.2")) {
                 getLogger().severe("LiteKits version is too old to use this extension. Disabling self...");
                 setEnabled(false);
             }
@@ -46,6 +46,7 @@ public class Cooldowns extends JavaPlugin implements Listener {
     
     @EventHandler
     public void onKitAttempt(KitCheckEvent e) {
+        getLogger().info("Got it.");
         if (getConfig().getBoolean("once-per-life", false) && getMetadata(e.getPlayer(), "gotKitThisLife") != null && ((Boolean)getMetadata(e.getPlayer(), "gotKitThisLife"))) {
             e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You can only receieve one kit per life");
             e.setCancelled(true);
