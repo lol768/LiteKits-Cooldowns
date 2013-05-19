@@ -1,0 +1,8 @@
+name: LK-Cooldowns
+version: 1.1
+description: A LiteKits extension that allows for  configurable cooldowns.
+author: lol768
+load: STARTUP
+main: com.lol768.LiteKits.extensions.cooldowns.Cooldowns
+database: false
+soft-depend: [LiteKits]
