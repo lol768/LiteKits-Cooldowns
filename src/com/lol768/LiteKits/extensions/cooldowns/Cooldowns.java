@@ -32,8 +32,8 @@ public class Cooldowns extends JavaPlugin implements Listener {
             setEnabled(false);
         }
         
-        if (getConfig().getLong("cooldown", -1) < 0) {
-            getConfig().set("cooldown", 60);
+        if (getConfig().getLong("cooldown-default", -1) < 0) {
+            getConfig().set("cooldown-default", 60);
             saveConfig();
         }
         
@@ -50,25 +50,26 @@ public class Cooldowns extends JavaPlugin implements Listener {
         
     }
     
-    @EventHandler
+    @EventHandler(ignoreCancelled=true)
     public void onKitAttempt(KitCheckEvent e) {
-        if (getConfig().getBoolean("once-per-life", false) && getMetadata(e.getPlayer(), "gotKitThisLife") != null && ((Boolean)getMetadata(e.getPlayer(), "gotKitThisLife"))) {
+        if (getConfig().getBoolean("once-per-life", false) && getMetadata(e.getPlayer(), "gotKitThisLife-" + e.getKitName()) != null && ((Boolean)getMetadata(e.getPlayer(), "gotKitThisLife"))) {
             e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You can only receieve one kit per life");
             e.setCancelled(true);
             return;
         }
-        Long amount = (Long) getMetadata(e.getPlayer(), "lastKitTime");
+        Long amount = (Long) getMetadata(e.getPlayer(), "lastKitTime-" + e.getKitName());
         long now = System.currentTimeMillis() / 1000l;
+        long cda = (getConfig().contains("cooldown-" + e.getKitName())) ? getConfig().getLong("cooldown-" + e.getKitName()) : getConfig().getLong("cooldown-default", 0);
         if (amount != null) {
-            
-            if ((now - amount) < getConfig().getLong("cooldown", 0)) {
-                String word = ((getConfig().getLong("cooldown", 0) - (now - amount)) == 1) ? "second" : "seconds";
-                e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You must wait " + (getConfig().getLong("cooldown", 0) - (now - amount)) + " more " + word);
+           
+            if ((now - amount) < cda) {
+                String word = ((cda - (now - amount)) == 1) ? "second" : "seconds";
+                e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You must wait " + (cda - (now - amount)) + " more " + word);
                 e.setCancelled(true);
                 return;
             }
         }
-        setMetadata(e.getPlayer(), "lastKitTime", now);
+        setMetadata(e.getPlayer(), "lastKitTime-" + e.getKitName(), now);
         setMetadata(e.getPlayer(), "gotKitThisLife", true);
     }
     
@@ -76,7 +77,11 @@ public class Cooldowns extends JavaPlugin implements Listener {
     public void onPlayerDeath(PlayerDeathEvent e) {
         setMetadata(e.getEntity(), "gotKitThisLife", false);
         if ((boolean) getConfig().get("clear-cooldown-on-death", true)) {
-            setMetadata(e.getEntity(), "lastKitTime", 0);
+            for (String k : lk.getConfig().getConfigurationSection("kits").getKeys(false)) {
+                if (e.getEntity().hasMetadata("lastKitTime-" + k)) {
+                    e.getEntity().removeMetadata("lastKitTime-" + k, this);
+                }
+            }
         }
     }
     
