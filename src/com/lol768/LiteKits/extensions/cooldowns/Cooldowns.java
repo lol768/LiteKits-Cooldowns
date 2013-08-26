@@ -42,6 +42,11 @@ public class Cooldowns extends JavaPlugin implements Listener {
             saveConfig();
         }
         
+        if (!getConfig().contains("once-per-world")) {
+           getConfig().set("once-per-world", false);
+           saveConfig();
+        }
+        
         if (!getConfig().contains("clear-cooldown-on-death")) {
             getConfig().set("clear-cooldown-on-death", true);
             saveConfig();
@@ -52,6 +57,11 @@ public class Cooldowns extends JavaPlugin implements Listener {
     
     @EventHandler(ignoreCancelled=true)
     public void onKitAttempt(KitCheckEvent e) {
+        if(getConfig().getBoolean("once-per-world", false) && getMetadata(e.getPlayer(), "usedInWorld-" + e.getPlayer().getWorld().getName()) != null){
+            e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You can only recieve this kit once per world");
+            e.setCancelled(true);
+            return;
+        } 
         if (getConfig().getBoolean("once-per-life", false) && getMetadata(e.getPlayer(), "gotKitThisLife-" + e.getKitName()) != null && ((Boolean)getMetadata(e.getPlayer(), "gotKitThisLife"))) {
             e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You can only receieve one kit per life");
             e.setCancelled(true);
@@ -69,6 +79,7 @@ public class Cooldowns extends JavaPlugin implements Listener {
                 return;
             }
         }
+        setMetadata(e.getPlayer(), "usedInWorld-" + e.getPlayer().getWorld().getName(), true);
         setMetadata(e.getPlayer(), "lastKitTime-" + e.getKitName(), now);
         setMetadata(e.getPlayer(), "gotKitThisLife", true);
     }
