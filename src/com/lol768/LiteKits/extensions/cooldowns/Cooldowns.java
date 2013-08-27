@@ -1,4 +1,5 @@
 package com.lol768.LiteKits.extensions.cooldowns;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -47,6 +48,14 @@ public class Cooldowns extends JavaPlugin implements Listener {
            saveConfig();
         }
         
+        if (!getConfig().contains("world-exclusions")) {
+           List<String> worldExclusions = new ArrayList<String>();
+           worldExclusions.add("example-world");
+           worldExclusions.add("example-world2");
+           getConfig().set("world-exclusions", worldExclusions);
+           saveConfig();
+        }
+        
         if (!getConfig().contains("clear-cooldown-on-death")) {
             getConfig().set("clear-cooldown-on-death", true);
             saveConfig();
@@ -57,7 +66,7 @@ public class Cooldowns extends JavaPlugin implements Listener {
     
     @EventHandler(ignoreCancelled=true)
     public void onKitAttempt(KitCheckEvent e) {
-        if(getConfig().getBoolean("once-per-world", false) && getMetadata(e.getPlayer(), "usedInWorld-" + e.getPlayer().getWorld().getName()) != null){
+        if(getConfig().getBoolean("once-per-world", false) && !getConfig().getList("world-exclusions", new ArrayList<String>()).contains(e.getPlayer().getWorld().getName()) && getMetadata(e.getPlayer(), "usedInWorld-" + e.getPlayer().getWorld().getName()) != null){
             e.getPlayer().sendMessage(lk.getBrand(true) + ChatColor.RED + "You can only recieve this kit once per world");
             e.setCancelled(true);
             return;
